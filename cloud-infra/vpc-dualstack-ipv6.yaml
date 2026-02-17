@@ -35,29 +35,43 @@ Resources:
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
+    DependsOn: Ipv6VPCCidrBlock  # Wait for IPv6 assignment
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.14.0.0/21
       AssignIpv6AddressOnCreation: true
-      Ipv6CidrBlock: !Select [0, !Cidr [!Ref Ipv6VPCCidrBlock.Ipv6CidrBlock, 256, 64]]
-      AvailabilityZone: !Select [0, !GetAZs ""]
+      Ipv6CidrBlock: !Select 
+        - 0
+        - !Cidr 
+          - !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
+          - 256 
+          - 64
+      AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Public-A"
 
+
   PublicSubnetB:
     Type: AWS::EC2::Subnet
+    DependsOn: Ipv6VPCCidrBlock
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.14.8.0/21
       AssignIpv6AddressOnCreation: true
-      Ipv6CidrBlock: !Select [1, !Cidr [!Ref Ipv6VPCCidrBlock.Ipv6CidrBlock, 256, 64]]
-      AvailabilityZone: !Select [1, !GetAZs ""]
+      Ipv6CidrBlock: !Select 
+        - 1
+        - !Cidr 
+          - !Select [0, !GetAtt VPC.Ipv6CidrBlocks]  # Sequential /64 blocks
+          - 256 
+          - 64
+      AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Public-B"
+
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
