@@ -27,3 +27,6 @@
     @ini_set( 'max_execution_time', '300' );
     @ini_set( 'max_input_time', '300' );
     ```
+
+6. DualStack
+    It's required to add A and AAAA records to the DNS
