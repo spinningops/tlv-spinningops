@@ -1,6 +1,7 @@
 name: Deploy VPC DualStack CloudFormation
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - /cloud-infra/vpc-dualstack-ipv6.yaml
