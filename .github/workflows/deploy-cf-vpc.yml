@@ -8,7 +8,7 @@ on:
 env:
   STACK_NAME: dualstack-vpc
   TEMPLATE_FILE: ${{ github.workspace }}/cloud-infra/vpc-dualstack-ipv6.yaml
-  AWS_REGION: eu-central-1   # change to your region
+  AWS_REGION: il-central-1   # change to your region
 
 jobs:
   deploy:

@@ -55,7 +55,8 @@
                 "cloudformation:UpdateStack",
                 "cloudformation:DescribeStacks",
                 "cloudformation:DeleteStack",
-                "cloudformation:ListStackResources"
+                "cloudformation:ListStackResources",
+                "cloudformation:ValidateTemplate"
             ],
             "Resource": "*"
         }
