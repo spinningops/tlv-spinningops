@@ -60,7 +60,7 @@ Resources:
       Ipv6CidrBlock: !Select
         - 1
         - !Cidr
-          - !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
+          - !Select [1, !GetAtt VPC.Ipv6CidrBlocks]
           - 256
           - 64
       AvailabilityZone: !Select [1, !GetAZs ""]
