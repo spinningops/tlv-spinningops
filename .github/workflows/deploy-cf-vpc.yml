@@ -3,7 +3,7 @@ name: Deploy VPC DualStack CloudFormation
 on:
   push:
     paths:
-      - '/cloud-infra/vpc-dualstack-ipv6.yaml'
+      - ${{ github.workspace }}'/cloud-infra/vpc-dualstack-ipv6.yaml'
 
 env:
   STACK_NAME: dualstack-vpc
