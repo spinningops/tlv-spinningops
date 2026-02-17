@@ -1,4 +1,4 @@
-name: Deploy VPC CloudFormation
+name: Deploy VPC DualStack CloudFormation
 
 on:
   push:
