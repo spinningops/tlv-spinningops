@@ -1,7 +1,7 @@
 name: Deploy VPC DualStack CloudFormation
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Manual deployment
   # push:
   #   paths:
   #     - /cloud-infra/vpc-dualstack-ipv6.yaml
@@ -43,18 +43,3 @@ jobs:
           capabilities: CAPABILITY_NAMED_IAM
           region: ${{env.AWS_REGION}}
           no-fail-on-empty-changeset: '1'
-
-      # - name: Create and Execute Change Set
-      #   run: |
-      #     # Delete any lingering stacks/change sets first
-      #     aws cloudformation delete-stack --stack-name ${{ env.STACK_NAME }} || true
-      #     aws cloudformation wait stack-delete-complete --stack-name ${{ env.STACK_NAME }} || true
-
-      # - name: Deploy CloudFormation stack
-      #   run: |
-      #     aws cloudformation deploy \
-      #       --stack-name ${{ env.STACK_NAME }} \
-      #       --template-file ${{ env.TEMPLATE_FILE }} \
-      #       --capabilities CAPABILITY_NAMED_IAM \
-      #       --region ${{env.AWS_REGION}} \
-      #       --no-fail-on-empty-changeset
