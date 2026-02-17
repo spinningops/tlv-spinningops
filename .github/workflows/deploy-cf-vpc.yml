@@ -41,5 +41,5 @@ jobs:
             --stack-name ${{ env.STACK_NAME }} \
             --template-file ${{ env.TEMPLATE_FILE }} \
             --capabilities CAPABILITY_NAMED_IAM \
-            --region ${{env.AWS_REGION}}
+            --region ${{env.AWS_REGION}} \
             --no-fail-on-empty-changeset
