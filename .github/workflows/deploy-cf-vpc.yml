@@ -42,3 +42,4 @@ jobs:
             --template-file ${{ env.TEMPLATE_FILE }} \
             --capabilities CAPABILITY_NAMED_IAM \
             --region ${{env.AWS_REGION}}
+            --no-fail-on-empty-changeset
