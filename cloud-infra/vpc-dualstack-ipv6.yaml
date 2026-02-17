@@ -39,12 +39,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: 10.14.0.0/21
       AssignIpv6AddressOnCreation: true
-      Ipv6CidrBlock: !Select
-        - 0
-        - !Cidr
-          - !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
-          - 256
-          - 64
+      Ipv6CidrBlock: !Select [0, !Cidr [!Ref Ipv6VPCCidrBlock.Ipv6CidrBlock, 256, 64]]
       AvailabilityZone: !Select [0, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:
@@ -57,12 +52,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: 10.14.8.0/21
       AssignIpv6AddressOnCreation: true
-      Ipv6CidrBlock: !Select
-        - 1
-        - !Cidr
-          - !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
-          - 256
-          - 64
+      Ipv6CidrBlock: !Select [1, !Cidr [!Ref Ipv6VPCCidrBlock.Ipv6CidrBlock, 256, 64]]
       AvailabilityZone: !Select [1, !GetAZs ""]
       MapPublicIpOnLaunch: true
       Tags:

@@ -2,13 +2,13 @@ name: Deploy VPC DualStack CloudFormation
 
 on:
   push:
-    branches: [ main ]
-  # workflow_dispatch:
+    paths:
+      - '${{ github.workspace }}/cloud-infra/vpc-dualstack-ipv6.yaml'
 
 env:
   STACK_NAME: dualstack-vpc
   TEMPLATE_FILE: ${{ github.workspace }}/cloud-infra/vpc-dualstack-ipv6.yaml
-  AWS_REGION: il-central-1   # change to your region
+  AWS_REGION: il-central-1
 
 jobs:
   deploy:
@@ -22,15 +22,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # If you want to use OIDC with a role in your AWS account:
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<GITHUB_OIDC_ROLE_NAME>
-      #     aws-region: ${{ env.AWS_REGION }}
-
-      # Alternatively, comment the step above and uncomment this one
-      # if you prefer classic access keys stored as GitHub Secrets:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
