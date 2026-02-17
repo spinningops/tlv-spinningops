@@ -35,11 +35,26 @@ jobs:
           aws cloudformation validate-template \
             --template-body file://${{ env.TEMPLATE_FILE }}
 
-      - name: Deploy CloudFormation stack
-        run: |
-          aws cloudformation deploy \
-            --stack-name ${{ env.STACK_NAME }} \
-            --template-file ${{ env.TEMPLATE_FILE }} \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --region ${{env.AWS_REGION}} \
-            --no-fail-on-empty-changeset
+      - name: Deploy CloudFormation Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.2.0
+        with:
+          name: ${{ env.STACK_NAME }}
+          template: ${{ env.TEMPLATE_FILE }}
+          capabilities: CAPABILITY_NAMED_IAM
+          region: ${{env.AWS_REGION}}
+          no-fail-on-empty-changeset: '1'
+
+      # - name: Create and Execute Change Set
+      #   run: |
+      #     # Delete any lingering stacks/change sets first
+      #     aws cloudformation delete-stack --stack-name ${{ env.STACK_NAME }} || true
+      #     aws cloudformation wait stack-delete-complete --stack-name ${{ env.STACK_NAME }} || true
+
+      # - name: Deploy CloudFormation stack
+      #   run: |
+      #     aws cloudformation deploy \
+      #       --stack-name ${{ env.STACK_NAME }} \
+      #       --template-file ${{ env.TEMPLATE_FILE }} \
+      #       --capabilities CAPABILITY_NAMED_IAM \
+      #       --region ${{env.AWS_REGION}} \
+      #       --no-fail-on-empty-changeset
