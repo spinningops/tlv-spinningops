@@ -1,0 +1,48 @@
+http:
+  routers:
+    spinningops:
+      rule: "Host(`tlv.spinningops.com`)"
+      entryPoints:
+        - websecure
+      service: spinningops
+      tls:
+        certResolver: myresolver
+
+    # Optional: redirect plain HTTP to HTTPS at Traefik level
+    spinningops-http:
+      rule: "Host(`tlv.spinningops.com`)"
+      entryPoints:
+        - web
+      middlewares:
+        - https-redirect
+      service: spinningops
+
+  middlewares:
+    https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    secure-headers:
+      headers:
+        sslRedirect: true
+        frameDeny: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 63072000
+        contentTypeNosniff: true
+        accessControlAllowMethods:
+          - GET
+          - POST
+        accessControlAllowOriginList:
+          - "spinningops.com"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+        contentSecurityPolicy: "script-src 'self'"
+        referrerPolicy: "origin-when-cross-origin"
+
+  services:
+    spinningops:
+      loadBalancer:
+        servers:
+          - url: "http://wordpress:80"

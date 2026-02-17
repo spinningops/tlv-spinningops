@@ -1,0 +1,53 @@
+name: Deploy VPC CloudFormation
+
+on:
+  push:
+    branches: [ main ]
+  # workflow_dispatch:
+
+env:
+  STACK_NAME: dualstack-vpc
+  TEMPLATE_FILE: ${{ github.workspace }}/cloud-infra/vpc-dualstack-ipv6.yaml
+  AWS_REGION: eu-central-1   # change to your region
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # If you want to use OIDC with a role in your AWS account:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<GITHUB_OIDC_ROLE_NAME>
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Alternatively, comment the step above and uncomment this one
+      # if you prefer classic access keys stored as GitHub Secrets:
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validate CloudFormation template
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://${{ env.TEMPLATE_FILE }}
+
+      - name: Deploy CloudFormation stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${{ env.STACK_NAME }} \
+            --template-file ${{ env.TEMPLATE_FILE }} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides VpcCidr=10.14.0.0/16 \
+            --no-fail-on-empty-changeset

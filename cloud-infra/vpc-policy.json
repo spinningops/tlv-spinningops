@@ -1,0 +1,63 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EC2VPCPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateVpc",
+                "ec2:DescribeVpcs",
+                "ec2:ModifyVpcAttribute"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EC2NetworkingPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateInternetGateway",
+                "ec2:DeleteInternetGateway",
+                "ec2:AttachInternetGateway",
+                "ec2:DetachInternetGateway",
+                "ec2:DescribeInternetGateways",
+                "ec2:CreateRouteTable",
+                "ec2:CreateRoute",
+                "ec2:AssociateRouteTable",
+                "ec2:ReplaceRoute",
+                "ec2:DeleteRoute",
+                "ec2:DeleteRouteTable",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeSubnets",
+                "ec2:CreateSubnet",
+                "ec2:ModifySubnetAttribute",
+                "ec2:DeleteSubnet",
+                "ec2:CreateTags",
+                "ec2:DeleteTags",
+                "ec2:AllocateAddress",
+                "ec2:ReleaseAddress",
+                "ec2:DescribeAddresses",
+                "ec2:CreateNatGateway",
+                "ec2:DeleteNatGateway",
+                "ec2:DescribeNatGateways",
+                "ec2:AssociateNatGatewayAddress",
+                "ec2:DisassociateNatGatewayAddress"
+                
+                
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CloudFormationDeployAccess",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:UpdateStack",
+                "cloudformation:DescribeStacks",
+                "cloudformation:DeleteStack",
+                "cloudformation:ListStackResources"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

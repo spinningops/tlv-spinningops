@@ -1,0 +1,123 @@
+# version: '3.8'
+# If you have issues with mounting the ebs volume, make sure to delete the local volume
+# Make sure to open port 80 from anywhere to allow letsencrypt cert to be issued
+# Open HTTPS for additional services like Kubernetes and GitHub
+
+services:
+
+  traefik:
+    image: arm64v8/traefik
+    container_name: traefik
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    command:
+      # uncomment DEBUG for testing
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      # - "--providers.docker=true"
+      # - "--providers.docker.exposedbydefault=false"
+    #   added
+      - "--providers.file.filename=dynamic.yml"
+    #   - --providers.file.directory=/dynamic_config
+      - --providers.file.watch=true
+    # redirect to TLS
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      # uncomment acme-staging for testing
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=message@spinningops.com"
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      # - "./letsencrypt:/letsencrypt"
+      # - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./data/configuration/dynamic.yml:/dynamic.yml:ro"
+
+
+  wordpress:
+    image: arm64v8/wordpress
+    container_name: wp-spinningops-com
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "8081:80"
+    volumes:
+      - wp_data:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/wordpress.ini
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.spinningops.rule=Host(`tlv.spinningops.com`)"
+      - "traefik.http.routers.spinningops.entrypoints=websecure"
+      - "traefik.http.routers.spinningops.tls.certresolver=myresolver"
+      - "traefik.http.routers.spinningops.tls=true"
+    # - "traefik.http.routers.spinningops.tls.options=tlsv13only"
+    # - "traefik.http.routers.apitester-https.tls.options=mtls@file"
+      # secure headers
+      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.secure-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.secure-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.secure-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.secure-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.accesscontrolallowmethods=GET,POST"
+      - "traefik.http.middlewares.secure-headers.headers.accesscontrolalloworiginlist=tlv.spinningops.com"
+      - "traefik.http.middlewares.secure-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.secure-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.secure-headers.headers.contentsecuritypolicy=script-src 'self'"
+      - "traefik.http.middlewares.secure-headers.headers.referrerpolicy=origin-when-cross-origin"
+      # Default HTTP to HTTPS redirect
+      - "traefik.http.routers.https_redirect.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.https_redirect.entrypoints=web"
+      - "traefik.http.routers.https_redirect.priority=1"
+      - "traefik.http.routers.https_redirect.middlewares=htst_header"
+      - "traefik.http.middlewares.htst_header.headers.framedeny=true"
+      - "traefik.http.middlewares.htst_header.headers.sslredirect=true"
+      - "traefik.http.middlewares.htst_header.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.htst_header.headers.stsPreload=true"
+      - "traefik.http.middlewares.htst_header.headers.stsSeconds=15768000"
+      - "traefik.http.middlewares.htst_header.headers.forceSTSHeader=true"
+
+  db:
+    image: arm64v8/mysql
+    container_name: db-spinningops
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    expose:
+      - 3306
+
+volumes:
+  db_data:
+  wp_data:
