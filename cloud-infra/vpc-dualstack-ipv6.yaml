@@ -47,7 +47,7 @@ Resources:
           - 256 
           - 64
       AvailabilityZone: !Select [0, !GetAZs '']
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Public-A"
@@ -67,7 +67,7 @@ Resources:
           - 256 
           - 64
       AvailabilityZone: !Select [1, !GetAZs '']
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Public-B"
